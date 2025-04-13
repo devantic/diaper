@@ -257,10 +257,10 @@
 		style={props?.style}
 		use:scrollRestore={{ scrollElement: refs.children, snapPointIndex }}
 	>
-		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend}>
+		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend} class="z-50 absolute top-0 w-full backdrop-blur-sm">
 			{@render header?.()}
 		</header>
-		<main bind:this={refs.main} style:max-height={mainHeight - newTranslate + 'px'}>
+		<main bind:this={refs.main} style:max-height={dialogHeight - newTranslate + 'px'}>
 			{#if !hasRendered}
 				{#if children}
 					<section bind:this={refs.children} class="h-fit">
@@ -280,15 +280,15 @@
 			{:else}
 				<!--  -->
 				{#if snapPointIndex === 1 && snapPoint1Content}
-					<section transition:fade style="overflow:auto;">
+					<section transition:fade style="overflow:auto;" style:padding-top={headerHeight + 'px'}>
 						{@render snapPoint1Content()}
 					</section>
 				{:else if snapPointIndex > 1 && snapPoint2Content}
-					<section transition:fade style="overflow:auto;">
+					<section transition:fade style="overflow:auto;" style:padding-top={headerHeight + 'px'}>
 						{@render snapPoint2Content()}
 					</section>
 				{:else if children}
-					<section bind:this={refs.children} transition:fade style="overflow:auto;">
+					<section bind:this={refs.children} transition:fade style="overflow:auto;" style:padding-top={headerHeight + 'px'}>
 						{@render children()}
 					</section>
 				{/if}
