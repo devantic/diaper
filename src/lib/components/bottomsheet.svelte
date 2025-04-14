@@ -1,6 +1,6 @@
 <script module lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements'
-	import { untrack, type Snippet } from 'svelte'
+	import type { BottomsheetProps } from './types'
+	import { untrack } from 'svelte'
 	import './bottomsheet.css'
 	import { fade } from 'svelte/transition'
 
@@ -53,19 +53,7 @@
 		header,
 		children,
 		...props
-	}: {
-		open?: boolean
-		maxHeight?: string
-		height?: string
-		snapPoints?: number[] | 'auto'
-		initialSnapPoint?: number
-		snapPoint1Content?: Snippet
-		snapPoint2Content?: Snippet
-		onclose?: () => void
-		onsnap?: (progress: number) => void
-		header?: Snippet
-		children?: Snippet
-	} & HTMLAttributes<HTMLDialogElement> = $props()
+	}: BottomsheetProps = $props()
 
 	export function close() {
 		open = false
