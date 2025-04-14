@@ -249,7 +249,7 @@
 		if (height !== 'auto') return
 		if (!refs.children) return
 		if (!refs.main) return
-		autoHeight = refs.main.offsetHeight + headerHeight + 'px'
+		autoHeight = refs.main.offsetHeight + (headerOverlaysContent ? 0 : headerHeight) + 'px'
 	})
 </script>
 
@@ -265,7 +265,7 @@
 		{ontouchend}
 		use:scrollRestore={{ scrollElement: refs.children, snapPointIndex }}
 	>
-		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend} class:headerOverlaysContent>
+		<header bind:this={refs.header} class:headerOverlaysContent>
 			{#if header}
 				{@render header?.()}
 			{:else}

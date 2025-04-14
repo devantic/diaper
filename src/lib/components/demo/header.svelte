@@ -7,5 +7,5 @@
 		<h2 class="h4">{title}</h2>
 		<p class="italic font-medium">{subtitle}</p>
 	</div>
-	<button class="btn text-[#007AFF] font-medium" {onclick}>Close</button>
+	<button class="btn text-[#007AFF] font-medium outline-none" {onclick}>Close</button>
 </div>
