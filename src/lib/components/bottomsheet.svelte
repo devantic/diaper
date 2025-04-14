@@ -48,6 +48,7 @@
 		initialSnapPoint = 0,
 		snapPoint1Content,
 		snapPoint2Content,
+		headerOverlaysContent = false,
 		onclose = () => {},
 		onsnap = () => {},
 		header,
@@ -264,14 +265,14 @@
 		{ontouchend}
 		use:scrollRestore={{ scrollElement: refs.children, snapPointIndex }}
 	>
-		<header bind:this={refs.header} class="z-50 absolute top-0 w-full backdrop-blur-sm">
+		<header bind:this={refs.header} class={headerOverlaysContent ? 'absolute top-0 w-full backdrop-blur-sm' : ''}>
 			{#if header}
 				{@render header?.()}
 			{:else}
 				<div class="handle"></div>
 			{/if}
 		</header>
-		<main bind:this={refs.main} style:max-height={dialogHeight - newTranslate + 'px'}>
+		<main bind:this={refs.main} style:max-height={(headerOverlaysContent ? dialogHeight : mainHeight) - newTranslate + 'px'}>
 			{#if !hasRendered}
 				{#if children}
 					<section bind:this={refs.children} class="h-fit">
@@ -291,15 +292,15 @@
 			{:else}
 				<!--  -->
 				{#if snapPointIndex === 1 && snapPoint1Content}
-					<section transition:fade style="overflow:auto;" style:padding-top={headerHeight + 'px'}>
+					<section transition:fade style="overflow:auto;" style:padding-top={headerOverlaysContent ? headerHeight + 'px' : 0}>
 						{@render snapPoint1Content()}
 					</section>
 				{:else if snapPointIndex > 1 && snapPoint2Content}
-					<section transition:fade style="overflow:auto;" style:padding-top={headerHeight + 'px'}>
+					<section transition:fade style="overflow:auto;" style:padding-top={headerOverlaysContent ? headerHeight + 'px' : 0}>
 						{@render snapPoint2Content()}
 					</section>
 				{:else if children}
-					<section bind:this={refs.children} transition:fade style="overflow:auto;" style:padding-top={headerHeight + 'px'}>
+					<section bind:this={refs.children} transition:fade style="overflow:auto;" style:padding-top={headerOverlaysContent ? headerHeight + 'px' : 0}>
 						{@render children()}
 					</section>
 				{/if}

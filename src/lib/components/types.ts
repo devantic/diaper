@@ -9,6 +9,7 @@ export type BottomsheetProps = {
 	initialSnapPoint?: number
 	snapPoint1Content?: Snippet
 	snapPoint2Content?: Snippet
+	headerOverlaysContent?: boolean
 	onclose?: () => void
 	onsnap?: (progress: number) => void
 	header?: Snippet
