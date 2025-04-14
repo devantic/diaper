@@ -123,6 +123,7 @@
 	let dialog: HTMLDialogElement
 	let backgroundElement: HTMLElement
 	let startY = 0
+	let prevY = 0
 	let lastTranslate = 0
 	let isTouching = false
 	let isTransitioning = true
@@ -163,7 +164,21 @@
 	function ontouchmove(e: TouchEvent) {
 		if (startY === 0) return
 		if (!isTouching) return
-		newTranslate = lastTranslate + e.touches[0].clientY - startY
+		if (e.target === e.currentTarget) return
+		const clientY = e.touches[0].clientY
+		const direction = clientY > prevY ? 'down' : 'up'
+		prevY = clientY
+		if (refs.children!.scrollTop > 0) {
+			refs.children!.style.setProperty('overscroll-behavior', 'contain')
+		} else {
+			refs.children!.style.setProperty('overscroll-behavior', 'none')
+		}
+		if (refs.children!.scrollTop > 0 && direction === 'down' && !refs.header?.contains(e.target as HTMLElement)) {
+			startY = 0
+			prevY = 0
+			return
+		}
+		newTranslate = lastTranslate + clientY - startY
 		if (newTranslate > 0) {
 			dialog.style.setProperty('translate', `0 ${newTranslate}px`)
 		}
@@ -175,12 +190,13 @@
 		applyProgress(progress)
 	}
 
-	function ontouchend(e) {
+	function ontouchend() {
 		setRootProperty('--duration', duration)
 		// if (newTranslate === 0) return
 		if (!isTouching) return
 		snapToIndex(snapPointIndex)
 		startY = 0
+		prevY = 0
 		isTouching = false
 	}
 
@@ -255,9 +271,12 @@
 		style:max-height={maxHeight}
 		class={props?.class}
 		style={props?.style}
+		{ontouchstart}
+		{ontouchmove}
+		{ontouchend}
 		use:scrollRestore={{ scrollElement: refs.children, snapPointIndex }}
 	>
-		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend} class="z-50 absolute top-0 w-full backdrop-blur-sm">
+		<header bind:this={refs.header} class="z-50 absolute top-0 w-full backdrop-blur-sm">
 			{@render header?.()}
 		</header>
 		<main bind:this={refs.main} style:max-height={dialogHeight - newTranslate + 'px'}>

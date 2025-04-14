@@ -10,7 +10,7 @@
 	<button class="btn btn-sm preset-outlined-secondary-600-400" onclick={() => (open = true)}>Open</button>
 </div>
 
-<Bottomsheet bind:open snapPoints={[0.5]}>
+<Bottomsheet bind:open snapPoints={[0.3, 0.7]}>
 	{#snippet header()}
 		<Header title="Scrollable Sheet" subtitle="With Fixed Snap Point" onclick={() => (open = false)} />
 	{/snippet}
