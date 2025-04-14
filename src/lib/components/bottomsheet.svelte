@@ -246,7 +246,7 @@
 		style={props?.style}
 		use:scrollRestore={{ scrollElement: refs.children, snapPointIndex }}
 	>
-		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend} class={headerOverlaysContent ? 'absolute top-0 w-full backdrop-blur-sm' : ''}>
+		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend} class:headerOverlaysContent>
 			{#if header}
 				{@render header?.()}
 			{:else}
@@ -308,5 +308,12 @@
 		background-color: #e0e0e0;
 		border-radius: 2px;
 		margin: 16px auto;
+	}
+	.headerOverlaysContent {
+		position: absolute;
+		top: 0;
+		z-index: 50;
+		width: 100%;
+		backdrop-filter: blur(8px);
 	}
 </style>
