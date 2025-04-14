@@ -258,7 +258,11 @@
 		use:scrollRestore={{ scrollElement: refs.children, snapPointIndex }}
 	>
 		<header bind:this={refs.header} {ontouchstart} {ontouchmove} {ontouchend} class="z-50 absolute top-0 w-full backdrop-blur-sm">
-			{@render header?.()}
+			{#if header}
+				{@render header?.()}
+			{:else}
+				<div class="handle"></div>
+			{/if}
 		</header>
 		<main bind:this={refs.main} style:max-height={dialogHeight - newTranslate + 'px'}>
 			{#if !hasRendered}
@@ -308,5 +312,12 @@
 	}
 	.h-fit {
 		height: fit-content;
+	}
+	.handle {
+		width: 40px;
+		height: 4px;
+		background-color: #e0e0e0;
+		border-radius: 2px;
+		margin: 16px auto;
 	}
 </style>

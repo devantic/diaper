@@ -18,3 +18,9 @@
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>
+<script type="module">
+	// detect iOS Safari
+	if ('standalone' in navigator && !navigator.standalone) {
+		import('https://unpkg.com/pwacompat')
+	}
+</script>
