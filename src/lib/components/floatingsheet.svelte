@@ -100,6 +100,7 @@
 
 	$effect.pre(() => {
 		if (!dialog) return
+		open
 		const bcr = dialog.getBoundingClientRect()
 		y = innerHeight - bcr.top
 	})
@@ -120,7 +121,8 @@
 				bind:this={dialog}
 				bind:offsetHeight
 				open
-				transition:fly={{ y, opacity: 1 }}
+				in:fly={{ y, opacity: 1 }}
+				out:fly={{ y: 300, opacity: 0, duration: 300 }}
 				{ontouchstart}
 				{ontouchend}
 				class={props?.class}
