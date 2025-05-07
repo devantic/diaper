@@ -154,9 +154,6 @@
 		display: flex;
 		flex-direction: column;
 		height: calc(100% + 1px);
-		box-shadow:
-			0 10px 0 0 inset red,
-			0 -10px 0 0 inset red;
 		padding-left: calc(var(--sail) + 0.375rem);
 		padding-right: calc(var(--sair) + 0.375rem);
 	}
