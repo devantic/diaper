@@ -144,6 +144,7 @@
 		position: fixed;
 		inset: 0;
 		overflow-y: scroll;
+		overscroll-behavior-y: contain;
 		scrollbar-width: none;
 		scrollbar-color: transparent transparent;
 		-webkit-scrollbar: hidden;
