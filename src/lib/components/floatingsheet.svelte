@@ -5,7 +5,7 @@
 	type FloatingsheetProps = {
 		open?: boolean
 		justify?: 'start' | 'center' | 'end'
-		resistance?: 'none' | 'normal' | 'full'
+		resistance?: 'none' | 'normal' | 'futile'
 		children?: Snippet
 		class?: string
 		style?: string
@@ -37,7 +37,7 @@
 		switch (resistance) {
 			case 'none':
 				return `calc(200% - ${offsetHeight + sait + saib}px)`
-			case 'full':
+			case 'futile':
 				return '100%'
 			case 'normal':
 			default:
