@@ -19,6 +19,7 @@
 	}
 
 	function ontouchend() {
+		return
 		isTouching = false
 		scrollTop = scrollContainer!.scrollTop
 		if (scrollTop < -100) {
@@ -38,7 +39,7 @@
 
 	let scrollTop = $state(0)
 	function onscroll(e: Event) {
-		// return
+		return
 		scrollTop = scrollContainer!.scrollTop
 		if (scrollTop < -100 && !isTouching) {
 			open = false
@@ -49,9 +50,7 @@
 	let scrollContainer = $state<HTMLDivElement>()
 	let offsetHeight = $state(0)
 	let translate = $state(0)
-
 	let resistance = $derived(props.resistance || 'normal')
-
 	let height = $derived.by(() => {
 		switch (resistance) {
 			case 'none':
@@ -86,6 +85,7 @@
 			}
 		})
 	})
+
 	let innerHeight = $state(0)
 	let y = $derived(innerHeight)
 
@@ -95,7 +95,9 @@
 		y = innerHeight - bcr.top
 	})
 
-	$inspect({ offsetHeight, innerHeight })
+	$effect(() => {
+		if (!open) translate = 0
+	})
 </script>
 
 <svelte:window bind:innerHeight />
@@ -124,8 +126,6 @@
 {/if}
 
 <style>
-	:global(:root) {
-	}
 	dialog {
 		color-scheme: light dark;
 		--light: #fcfcfc;
@@ -142,7 +142,6 @@
 		background-color: var(--bg);
 		color: var(--fg);
 		border-radius: 2rem;
-		translate: 0 -224px;
 	}
 
 	.dialog-container {
