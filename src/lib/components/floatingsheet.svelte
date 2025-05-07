@@ -46,6 +46,9 @@
 		}
 	}
 
+	let sait = $state(0)
+	let saib = $state(0)
+
 	let dialog = $state<HTMLDialogElement>()
 	let scrollContainer = $state<HTMLDivElement>()
 	let offsetHeight = $state(0)
@@ -54,7 +57,7 @@
 	let height = $derived.by(() => {
 		switch (resistance) {
 			case 'none':
-				return `calc(200% - ${offsetHeight}px)`
+				return `calc(200% - ${offsetHeight + sait + saib}px)`
 			case 'full':
 				return '100%'
 			case 'normal':
@@ -65,10 +68,16 @@
 
 	$effect(() => {
 		if (!scrollContainer) return
+		saib = parseInt(getComputedStyle(scrollContainer).getPropertyValue('--saib'))
+		sait = parseInt(getComputedStyle(scrollContainer).getPropertyValue('--sait'))
+	})
+
+	$effect(() => {
+		if (!dialog) return
 		if (resistance !== 'none') return
 		requestAnimationFrame(() => {
 			if (!scrollContainer) return
-			const yAdjust = innerHeight - offsetHeight
+			const yAdjust = innerHeight - offsetHeight - sait - saib
 			switch (props.justify) {
 				case 'start':
 					scrollContainer.scrollTop = yAdjust
@@ -126,6 +135,32 @@
 {/if}
 
 <style>
+	.scroll-container {
+		--sait: env(safe-area-inset-top);
+		--saib: env(safe-area-inset-bottom);
+		--sail: env(safe-area-inset-left);
+		--sair: env(safe-area-inset-right);
+		margin: 0;
+		position: fixed;
+		inset: 0;
+		overflow-y: scroll;
+		scrollbar-width: none;
+		scrollbar-color: transparent transparent;
+		-webkit-scrollbar: hidden;
+		/* background: linear-gradient(rgba(0, 255, 0, 0.5), transparent); */
+	}
+
+	.dialog-container {
+		display: flex;
+		flex-direction: column;
+		height: calc(100% + 1px);
+		box-shadow:
+			0 10px 0 0 inset red,
+			0 -10px 0 0 inset red;
+		padding-left: calc(var(--sail) + 0.375rem);
+		padding-right: calc(var(--sair) + 0.375rem);
+	}
+
 	dialog {
 		color-scheme: light dark;
 		--light: #fcfcfc;
@@ -142,32 +177,10 @@
 		background-color: var(--bg);
 		color: var(--fg);
 		border-radius: 2rem;
+		margin-top: calc(var(--sait) + 0.375rem);
+		margin-bottom: calc(var(--saib) + 0.375rem);
 	}
 
-	.dialog-container {
-		--sait: env(safe-area-inset-top);
-		--saib: env(safe-area-inset-bottom);
-		--sail: env(safe-area-inset-left);
-		--sair: env(safe-area-inset-right);
-		display: flex;
-		flex-direction: column;
-		height: calc(100% + 1px);
-		padding-top: calc(var(--sait) + 0.375rem);
-		padding-bottom: calc(var(--saib) + 0.375rem);
-		padding-left: calc(var(--sail) + 0.375rem);
-		padding-right: calc(var(--sair) + 0.375rem);
-		/* padding-bottom: var(--saib); */
-	}
-	.scroll-container {
-		margin: 0;
-		position: fixed;
-		inset: 0;
-		overflow-y: scroll;
-		scrollbar-width: none;
-		scrollbar-color: transparent transparent;
-		-webkit-scrollbar: hidden;
-		/* background: linear-gradient(rgba(0, 255, 0, 0.5), transparent); */
-	}
 	.dialog-backdrop {
 		margin: 0;
 		position: fixed;
