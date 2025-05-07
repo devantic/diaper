@@ -51,14 +51,46 @@
 	let height = $derived.by(() => {
 		return props.resistance === 'normal' ? 'calc(100% + 1px)' : `calc(100% + ${448 / 2}px)`
 	})
+
+	let offsetHeight = $state(0)
+	let translate = $state(0)
+	$effect(() => {
+		if (!scrollContainer) return
+		const yAdjust = offsetHeight / 2
+		switch (props.justify) {
+			case 'end':
+				scrollContainer.scrollTop = 0
+				translate = -yAdjust
+				break
+			case 'start':
+				scrollContainer.scrollTop = yAdjust
+				translate = yAdjust
+				break
+			default:
+				scrollContainer.scrollTop = yAdjust / 2
+				translate = 0
+		}
+	})
+
+	$inspect({ offsetHeight })
 </script>
 
 {#if open}
 	<div class="fixed top-16 left-4 p-2 bg-black text-white">{scrollTop}</div>
 	<div transition:fade class="dialog-backdrop"></div>
 	<div bind:this={scrollContainer} class="scroll-container" {onscroll} use:noscroll>
-		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height>
-			<dialog open transition:fly={{ y: 560, opacity: 1 }} {ontouchstart} {ontouchend} class={props?.class} style={props?.style} use:noscroll>
+		<div class="dialog-container" style:justify-content={props.justify || 'center'} style:height>
+			<dialog
+				bind:offsetHeight
+				open
+				transition:fly={{ y: 560, opacity: 1 }}
+				{ontouchstart}
+				{ontouchend}
+				class={props?.class}
+				style={props?.style}
+				use:noscroll
+				style:translate="0 {translate}px"
+			>
 				{@render children?.()}
 			</dialog>
 		</div>
@@ -84,6 +116,7 @@
 		background-color: var(--bg);
 		color: var(--fg);
 		border-radius: 2rem;
+		translate: 0 -224px;
 	}
 
 	.dialog-container {
@@ -108,6 +141,7 @@
 		scrollbar-width: none;
 		scrollbar-color: transparent transparent;
 		-webkit-scrollbar: hidden;
+		background: linear-gradient(rgba(0, 255, 0, 0.5), transparent);
 	}
 	.dialog-backdrop {
 		margin: 0;

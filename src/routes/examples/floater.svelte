@@ -12,7 +12,7 @@
 
 <link rel="preload" as="image" href="https://picsum.photos/id/830/170/170" />
 
-<Floatingsheet bind:open justify="center" resistance="normal">
+<Floatingsheet bind:open justify="start" resistance="none">
 	<button class="absolute top-4 right-4 btn-icon preset-filled-surface-500 rounded-full" onclick={() => (open = false)}><X /></button>
 	<div class="text-center flex flex-col items-center pt-6 pb-6 px-4 gap-4 text-balance">
 		<img class="rounded-2xl h-[170px]" src="https://picsum.photos/id/830/170/170" alt="" />
