@@ -11,7 +11,7 @@
 		style?: string
 	}
 
-	let { open = $bindable(false), children, ...props }: FloatingsheetProps = $props()
+	let { open = $bindable(false), ...props }: FloatingsheetProps = $props()
 
 	let isTouching = false
 	function ontouchstart() {
@@ -20,7 +20,7 @@
 
 	function ontouchend() {
 		isTouching = false
-		scrollTop = scrollContainer.scrollTop
+		scrollTop = scrollContainer!.scrollTop
 		if (scrollTop < -100) {
 			open = false
 		}
@@ -39,51 +39,76 @@
 	let scrollTop = $state(0)
 	function onscroll(e: Event) {
 		// return
-		const target = e.target as HTMLDialogElement
-		scrollTop = target.scrollTop
+		scrollTop = scrollContainer!.scrollTop
 		if (scrollTop < -100 && !isTouching) {
 			open = false
 		}
 	}
 
+	let dialog = $state<HTMLDialogElement>()
 	let scrollContainer = $state<HTMLDivElement>()
-
-	let height = $derived.by(() => {
-		return props.resistance === 'normal' ? 'calc(100% + 1px)' : `calc(100% + ${offsetHeight / 2}px)`
-	})
-
 	let offsetHeight = $state(0)
 	let translate = $state(0)
-	$effect(() => {
-		if (!scrollContainer) return
-		const yAdjust = offsetHeight / 2
-		switch (props.justify) {
-			case 'end':
-				scrollContainer.scrollTop = 0
-				translate = -yAdjust
-				break
-			case 'start':
-				scrollContainer.scrollTop = yAdjust
-				translate = yAdjust
-				break
-			default:
-				scrollContainer.scrollTop = yAdjust / 2
-				translate = 0
+
+	let resistance = $derived(props.resistance || 'normal')
+
+	let height = $derived.by(() => {
+		switch (resistance) {
+			case 'none':
+				return `calc(100% + ${offsetHeight / 2}px)`
+			case 'normal':
+				return 'calc(100% + 1px)'
+			case 'full':
+				return '100%'
 		}
 	})
 
-	$inspect({ offsetHeight })
+	$effect(() => {
+		if (!scrollContainer) return
+		if (resistance !== 'none') return
+		requestAnimationFrame(() => {
+			if (!scrollContainer) return
+			const yAdjust = offsetHeight / 2
+			switch (props.justify) {
+				case 'start':
+					scrollContainer.scrollTop = yAdjust
+					translate = yAdjust
+					break
+				case 'center':
+					scrollContainer.scrollTop = yAdjust / 2
+					translate = 0
+					break
+				default: // end
+					scrollContainer.scrollTop = 0
+					translate = -yAdjust
+					break
+			}
+		})
+	})
+	let innerHeight = $state(0)
+	let y = $derived(innerHeight)
+
+	$effect.pre(() => {
+		if (!dialog) return
+		const bcr = dialog.getBoundingClientRect()
+		y = innerHeight - bcr.top
+	})
+
+	$inspect({ offsetHeight, innerHeight })
 </script>
+
+<svelte:window bind:innerHeight />
 
 {#if open}
 	<div class="fixed top-16 left-4 p-2 bg-black text-white">{scrollTop}</div>
 	<div transition:fade class="dialog-backdrop"></div>
 	<div bind:this={scrollContainer} class="scroll-container" {onscroll} use:noscroll>
-		<div class="dialog-container" style:justify-content={props.justify || 'center'} style:height>
+		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height>
 			<dialog
+				bind:this={dialog}
 				bind:offsetHeight
 				open
-				transition:fly={{ y: 560, opacity: 1 }}
+				transition:fly={{ y, opacity: 1 }}
 				{ontouchstart}
 				{ontouchend}
 				class={props?.class}
@@ -91,7 +116,7 @@
 				use:noscroll
 				style:translate="0 {translate}px"
 			>
-				{@render children?.()}
+				{@render props.children?.()}
 			</dialog>
 		</div>
 	</div>
