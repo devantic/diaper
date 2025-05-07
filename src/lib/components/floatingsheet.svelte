@@ -92,7 +92,7 @@
 	<div transition:fade class="dialog-backdrop"></div>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div bind:this={scrollContainer} class="scroll-container" use:noscroll>
+	<div bind:this={scrollContainer} class="scroll-container">
 		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height onclick={handleContainerClick}>
 			<dialog
 				bind:this={dialog}
@@ -101,8 +101,8 @@
 				transition:fly={{ y: props.justify === 'start' ? -innerHeight / 2 : innerHeight / 2, opacity: 0 }}
 				class={props?.class}
 				style={props?.style}
-				use:noscroll
 				style:translate="0 {translate}px"
+				use:noscroll
 			>
 				{@render props.children?.()}
 			</dialog>

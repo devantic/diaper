@@ -16,7 +16,7 @@
 	<select class="select" bind:value={resistance}>
 		<option value="none">None</option>
 		<option value="normal">Normal</option>
-		<option value="full">Full</option>
+		<option value="futile">Futile</option>
 	</select>
 	<button class="btn btn-sm preset-outlined-secondary-600-400" onclick={() => (open = true)}>Open</button>
 </div>
