@@ -14,19 +14,9 @@
 
 	let { open = $bindable(false), closeOnClickOutside = true, ...props }: FloatingsheetProps = $props()
 
-	function noscroll(node: HTMLElement) {
-		// prevent scrolling on background
-		function touchstart(e: TouchEvent) {
-			if (e.target === e.currentTarget) e.preventDefault()
-		}
-		$effect(() => {
-			node.addEventListener('touchstart', touchstart)
-			return () => node.removeEventListener('touchstart', touchstart)
-		})
-	}
-
 	let sait = $state(0)
 	let saib = $state(0)
+	let innerHeight = $state(0)
 
 	let dialog = $state<HTMLDialogElement>()
 	let scrollContainer = $state<HTMLDivElement>()
@@ -44,6 +34,17 @@
 				return 'calc(100% + 1px)'
 		}
 	})
+
+	function noscroll(node: HTMLElement) {
+		// prevent scrolling on background
+		function touchstart(e: TouchEvent) {
+			if (e.target === e.currentTarget) e.preventDefault()
+		}
+		$effect(() => {
+			node.addEventListener('touchstart', touchstart)
+			return () => node.removeEventListener('touchstart', touchstart)
+		})
+	}
 
 	function handleContainerClick(e: MouseEvent) {
 		if (closeOnClickOutside && e.target === e.currentTarget) {
@@ -80,16 +81,6 @@
 		})
 	})
 
-	let innerHeight = $state(0)
-	let y = $derived(innerHeight)
-
-	$effect.pre(() => {
-		if (!dialog) return
-		open
-		const bcr = dialog.getBoundingClientRect()
-		y = innerHeight - bcr.top
-	})
-
 	$effect(() => {
 		if (!open) translate = 0
 	})
@@ -107,8 +98,7 @@
 				bind:this={dialog}
 				bind:offsetHeight
 				open
-				in:fly={{ y, opacity: 1 }}
-				out:fly={{ y: 300, opacity: 0, duration: 300 }}
+				transition:fly={{ y: props.justify === 'start' ? -innerHeight / 2 : innerHeight / 2, opacity: 0 }}
 				class={props?.class}
 				style={props?.style}
 				use:noscroll
