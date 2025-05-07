@@ -13,20 +13,6 @@
 
 	let { open = $bindable(false), ...props }: FloatingsheetProps = $props()
 
-	let isTouching = false
-	function ontouchstart() {
-		isTouching = true
-	}
-
-	function ontouchend() {
-		return
-		isTouching = false
-		scrollTop = scrollContainer!.scrollTop
-		if (scrollTop < -100) {
-			open = false
-		}
-	}
-
 	function noscroll(node: HTMLElement) {
 		function touchstart(e: TouchEvent) {
 			if (e.target === e.currentTarget) e.preventDefault()
@@ -38,13 +24,6 @@
 	}
 
 	let scrollTop = $state(0)
-	function onscroll(e: Event) {
-		return
-		scrollTop = scrollContainer!.scrollTop
-		if (scrollTop < -100 && !isTouching) {
-			open = false
-		}
-	}
 
 	let sait = $state(0)
 	let saib = $state(0)
@@ -115,7 +94,9 @@
 {#if open}
 	<div class="fixed top-16 left-4 p-2 bg-black text-white">{scrollTop}</div>
 	<div transition:fade class="dialog-backdrop"></div>
-	<div bind:this={scrollContainer} class="scroll-container" {onscroll} use:noscroll>
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div bind:this={scrollContainer} class="scroll-container" use:noscroll onclick={() => (open = false)}>
 		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height>
 			<dialog
 				bind:this={dialog}
@@ -123,8 +104,6 @@
 				open
 				in:fly={{ y, opacity: 1 }}
 				out:fly={{ y: 300, opacity: 0, duration: 300 }}
-				{ontouchstart}
-				{ontouchend}
 				class={props?.class}
 				style={props?.style}
 				use:noscroll
