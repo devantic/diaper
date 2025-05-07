@@ -20,6 +20,7 @@
 	import Stackabledetached from './examples/stackable-detached.svelte'
 	import ExperimentsStickyheader from './examples/experiments-stickyheader.svelte'
 	import ExpermentsSnappoints from './examples/experiments-snappoints.svelte'
+	import Floating from './examples/floating.svelte'
 </script>
 
 <main class="overflow-auto pt-2">
@@ -48,6 +49,7 @@
 				>Star on Github<Star color="#f007" fill="gold"></Star></a
 			>
 		</p>
+		<Floating />
 		<div class="space-y-2">
 			<h2 class="h3 border-b">Basic sheets</h2>
 			<p>Basic sheets can be opened and closed but not resized.</p>
