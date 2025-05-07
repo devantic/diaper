@@ -56,10 +56,11 @@
 		switch (resistance) {
 			case 'none':
 				return `calc(100% + ${offsetHeight / 2}px)`
-			case 'normal':
-				return 'calc(100% + 1px)'
 			case 'full':
 				return '100%'
+			case 'normal':
+			default:
+				return 'calc(100% + 1px)'
 		}
 	})
 
