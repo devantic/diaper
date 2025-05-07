@@ -54,7 +54,7 @@
 	let height = $derived.by(() => {
 		switch (resistance) {
 			case 'none':
-				return `calc(100% + ${offsetHeight / 2}px)`
+				return `calc(200% - ${offsetHeight}px)`
 			case 'full':
 				return '100%'
 			case 'normal':
@@ -68,7 +68,7 @@
 		if (resistance !== 'none') return
 		requestAnimationFrame(() => {
 			if (!scrollContainer) return
-			const yAdjust = offsetHeight / 2
+			const yAdjust = innerHeight - offsetHeight
 			switch (props.justify) {
 				case 'start':
 					scrollContainer.scrollTop = yAdjust

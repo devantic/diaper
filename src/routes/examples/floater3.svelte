@@ -23,13 +23,10 @@
 
 <link rel="preload" as="image" href="https://picsum.photos/id/830/170/170" />
 
-<Floatingsheet bind:open {justify} {resistance}>
+<Floatingsheet bind:open {justify} {resistance} class="bg-warning-400-600! rounded!">
 	<button class="absolute top-4 right-4 btn-icon preset-filled-surface-500 rounded-full" onclick={() => (open = false)}><X /></button>
-	<div class="text-center flex flex-col items-center pt-6 pb-6 px-4 gap-4 text-balance">
-		<!-- <img class="rounded-2xl h-[170px]" src="https://picsum.photos/id/830/170/170" alt="" /> -->
-		<h1 class="h2 pt-4">Detached Sheet</h1>
-		<p class="opacity-75 text-balance">A convenience component, <i>Detachedsheet</i>, is provided for this</p>
-		<code class="code">{`<Detachedsheet height="auto">`}</code>
-		<button class="btn btn-base preset-filled-surface-800-200 rounded-full px-8" onclick={() => (open = false)}>Got It</button>
-	</div>
+	<!-- <div class="text-center p-4"> -->
+	<!-- <img class="rounded-2xl h-[170px]" src="https://picsum.photos/id/830/170/170" alt="" /> -->
+	<h1 class="h4 p-4 pl-8">Detached Sheet</h1>
+	<!-- </div> -->
 </Floatingsheet>
