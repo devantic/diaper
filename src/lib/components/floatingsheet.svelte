@@ -7,11 +7,12 @@
 		justify?: 'start' | 'center' | 'end'
 		resistance?: 'none' | 'normal' | 'futile'
 		children?: Snippet
+		closeOnClickOutside?: boolean
 		class?: string
 		style?: string
 	}
 
-	let { open = $bindable(false), ...props }: FloatingsheetProps = $props()
+	let { open = $bindable(false), closeOnClickOutside = true, ...props }: FloatingsheetProps = $props()
 
 	function noscroll(node: HTMLElement) {
 		function touchstart(e: TouchEvent) {
@@ -44,6 +45,12 @@
 				return 'calc(100% + 1px)'
 		}
 	})
+
+	function handleContainerClick(e: MouseEvent) {
+		if (closeOnClickOutside && e.target === e.currentTarget) {
+			open = false
+		}
+	}
 
 	$effect(() => {
 		if (!scrollContainer) return
@@ -96,8 +103,8 @@
 	<div transition:fade class="dialog-backdrop"></div>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div bind:this={scrollContainer} class="scroll-container" use:noscroll onclick={() => (open = false)}>
-		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height>
+	<div bind:this={scrollContainer} class="scroll-container" use:noscroll>
+		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height onclick={handleContainerClick}>
 			<dialog
 				bind:this={dialog}
 				bind:offsetHeight
