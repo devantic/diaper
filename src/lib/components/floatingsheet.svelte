@@ -49,7 +49,7 @@
 	let scrollContainer = $state<HTMLDivElement>()
 
 	let height = $derived.by(() => {
-		return props.resistance === 'normal' ? 'calc(100% + 1px)' : `calc(100% + ${448 / 2}px)`
+		return props.resistance === 'normal' ? 'calc(100% + 1px)' : `calc(100% + ${offsetHeight / 2}px)`
 	})
 
 	let offsetHeight = $state(0)
@@ -141,7 +141,7 @@
 		scrollbar-width: none;
 		scrollbar-color: transparent transparent;
 		-webkit-scrollbar: hidden;
-		background: linear-gradient(rgba(0, 255, 0, 0.5), transparent);
+		/* background: linear-gradient(rgba(0, 255, 0, 0.5), transparent); */
 	}
 	.dialog-backdrop {
 		margin: 0;
