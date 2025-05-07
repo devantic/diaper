@@ -37,12 +37,12 @@
 
 	function noscroll(node: HTMLElement) {
 		// prevent scrolling on background
-		function touchstart(e: TouchEvent) {
-			if (e.target === e.currentTarget) e.preventDefault()
+		function touchmove(e: TouchEvent) {
+			if (!dialog!.contains(e.target as Node)) e.preventDefault()
 		}
 		$effect(() => {
-			node.addEventListener('touchstart', touchstart)
-			return () => node.removeEventListener('touchstart', touchstart)
+			node.addEventListener('touchmove', touchmove)
+			return () => node.removeEventListener('touchmove', touchmove)
 		})
 	}
 
@@ -92,7 +92,7 @@
 	<div transition:fade class="dialog-backdrop"></div>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div bind:this={scrollContainer} class="scroll-container">
+	<div bind:this={scrollContainer} class="scroll-container" use:noscroll>
 		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height onclick={handleContainerClick}>
 			<dialog
 				bind:this={dialog}
@@ -102,7 +102,6 @@
 				class={props?.class}
 				style={props?.style}
 				style:translate="0 {translate}px"
-				use:noscroll
 			>
 				{@render props.children?.()}
 			</dialog>
