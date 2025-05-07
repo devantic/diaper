@@ -15,6 +15,7 @@
 	let { open = $bindable(false), closeOnClickOutside = true, ...props }: FloatingsheetProps = $props()
 
 	function noscroll(node: HTMLElement) {
+		// prevent scrolling on background
 		function touchstart(e: TouchEvent) {
 			if (e.target === e.currentTarget) e.preventDefault()
 		}
