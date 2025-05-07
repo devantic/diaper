@@ -25,8 +25,6 @@
 		})
 	}
 
-	let scrollTop = $state(0)
-
 	let sait = $state(0)
 	let saib = $state(0)
 
@@ -100,7 +98,6 @@
 <svelte:window bind:innerHeight />
 
 {#if open}
-	<div class="fixed top-16 left-4 p-2 bg-black text-white">{scrollTop}</div>
 	<div transition:fade class="dialog-backdrop"></div>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -125,6 +122,11 @@
 
 <style>
 	.scroll-container {
+		color-scheme: light dark;
+		--light: #fcfcfc;
+		--dark: #222222;
+		--fg: light-dark(var(--dark), var(--light));
+		--bg: light-dark(var(--light), var(--dark));
 		--sait: env(safe-area-inset-top);
 		--saib: env(safe-area-inset-bottom);
 		--sail: env(safe-area-inset-left);
@@ -149,11 +151,6 @@
 	}
 
 	dialog {
-		color-scheme: light dark;
-		--light: #fcfcfc;
-		--dark: #222222;
-		--fg: light-dark(var(--dark), var(--light));
-		--bg: light-dark(var(--light), var(--dark));
 		position: relative;
 		overflow: clip;
 		width: 100%;
