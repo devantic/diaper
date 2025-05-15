@@ -143,7 +143,19 @@ export function draggable(node: HTMLElement): ActionReturn<Parameter, Attributes
 		isTouching = false
 	}
 
+	function setOverDragFillColor() {
+		const styles = getComputedStyle(node)
+		const sheetBackgroundColor = styles.getPropertyValue('background-color')
+		const marginBottom = styles.getPropertyValue('margin-bottom')
+		if (parseInt(marginBottom) > 0) {
+			node.style.setProperty('--diaper-overdrag-fill-color', 'transparent')
+		} else {
+			node.style.setProperty('--diaper-overdrag-fill-color', sheetBackgroundColor)
+		}
+	}
+
 	$effect(() => {
+		setOverDragFillColor()
 		node.addEventListener('touchstart', ontouchstart)
 		node.addEventListener('touchmove', ontouchmove)
 		node.addEventListener('touchend', ontouchend)

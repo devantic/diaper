@@ -238,20 +238,7 @@
 		autoHeight = `${offsetHeight}px`
 	})
 
-	// Effect 5 - overdrag
-	$effect(() => {
-		if (!rendered) return
-		const styles = getComputedStyle(dialog)
-		const sheetBackgroundColor = styles.getPropertyValue('background-color')
-		const marginBottom = styles.getPropertyValue('margin-bottom')
-		if (parseInt(marginBottom) > 0) {
-			dialog.style.setProperty('--diaper-overdrag-fill-color', 'transparent')
-		} else {
-			dialog.style.setProperty('--diaper-overdrag-fill-color', sheetBackgroundColor)
-		}
-	})
-
-	// Effect 6 - calc snappoints
+	// Effect 5 - calc snappoints
 	$effect(() => {
 		if (!rendered) return
 		snappoints = calcSnapPoints(snapPoints)
