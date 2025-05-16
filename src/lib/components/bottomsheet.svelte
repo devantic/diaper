@@ -194,20 +194,16 @@
 		else if (isOpen) snapToIndex(-1)
 	})
 
+	const dialogs = () => [...document.querySelectorAll('dialog[data-diaper]')] as HTMLDialogElement[]
+
 	// Effect 3 - show
 	$effect(() => {
 		if (!refs.ref) return
 		document.body.style.setProperty('overflow', 'hidden')
 		dialog = refs.ref as HTMLDialogElement
-		const dialogs = [...document.querySelectorAll('dialog')]
-		dialog.close()
-		if (stickyHeader && isMinimized && dialogs.length < 2) {
-			dialog.show()
-		} else {
-			dialog.showModal()
-		}
+		dialog.showModal()
 		dialogHeight = dialog.offsetHeight
-		backgroundElement = dialogs.at(-2) ?? document.body
+		backgroundElement = dialogs().at(-2) ?? document.body
 		initialized = true
 	})
 
@@ -255,7 +251,11 @@
 				dialog.show()
 			}
 		} else {
-			dialog.showModal()
+			if (stickyHeader && isMinimized && dialogs().length < 2) {
+				dialog.show()
+			} else {
+				dialog.showModal()
+			}
 		}
 	}
 
