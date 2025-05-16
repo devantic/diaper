@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import type { BottomsheetProps } from './types'
 	import { untrack } from 'svelte'
-	import { draggable, dyanamicDuration } from './actions.svelte'
+	import { draggable, dyanamicDuration, escapeToClose } from './actions.svelte'
 	import { noop, clamp } from './helpers'
 	import { insets } from './device.svelte'
 	import Snappoints from './snappoints.svelte'
@@ -185,24 +185,10 @@
 		if (closeOnBackdropTap && e.target === e.currentTarget) close()
 	}
 
-	function handleEscape(e: KeyboardEvent) {
-		if (e.key === 'Escape' && dialog.contains(e.target as Node)) {
-			e.preventDefault()
-			close()
-		}
-	}
-
 	// Effect 1 - open logic
 	$effect(() => {
 		if (open) isOpen = true
 		else if (isOpen) snapToIndex(-1)
-	})
-
-	// Effect 2 - escape key
-	$effect(() => {
-		if (!open) return
-		document.addEventListener('keydown', handleEscape)
-		return () => document.removeEventListener('keydown', handleEscape)
 	})
 
 	// Effect 3 - show
@@ -271,6 +257,7 @@
 		{onmoveend}
 		use:draggable
 		use:dyanamicDuration
+		use:escapeToClose={close}
 	>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
