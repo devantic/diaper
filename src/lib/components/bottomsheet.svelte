@@ -109,8 +109,8 @@
 
 	function applyProgress(progress: number) {
 		dialog.style.setProperty('--diaper-backdrop-progress', `${progress}`)
-		// only scale body or dialog underneath if drag is between full and the first snap point
 		if (flat) return
+		// only scale body or dialog underneath if drag is between full and the first snap point
 		if (backgroundElement === document.body) {
 			if (height === maxHeight) backgroundElement.style.setProperty('--diaper-progress', `${progress}`)
 		} else {
@@ -134,13 +134,8 @@
 
 	function onmoveend(e: CustomEvent) {
 		const deltaY = e.detail.deltaY
-		if (deltaY > 20) {
-			snapPointIndex += 2
-		} else if (deltaY > 5) {
-			snapPointIndex += 1
-		} else if (deltaY < -5) {
-			snapPointIndex = Math.max(--snapPointIndex, 0)
-		}
+		snapPointIndex += deltaY > 20 ? 2 : deltaY > 5 ? 1 : deltaY < -5 ? -1 : 0
+		snapPointIndex = Math.max(snapPointIndex, 0)
 		snapToIndex(snapPointIndex)
 		isTouching = false
 	}
