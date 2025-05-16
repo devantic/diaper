@@ -130,7 +130,7 @@
 	}
 
 	function onmove(e: CustomEvent) {
-		const { deltaY, translateY } = e.detail
+		const { translateY } = e.detail
 		snapPointIndex = snappoints.indexOfNearest(translateY / dialogHeight)
 		applyProgress(clamp(translateY / (dialogHeight * snappoints.at(1)), 0, 1))
 	}
