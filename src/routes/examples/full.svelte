@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Fullsheet } from '@devantic/diaper'
+	import { Fullsheet } from '$lib/components'
 	let open = $state(false)
 </script>
 
@@ -11,7 +11,7 @@
 
 <link rel="preload" as="image" href="https://picsum.photos/id/830/170/170" />
 
-<Fullsheet bind:open>
+<Fullsheet bind:open height="50%" nonmodal>
 	<div class="text-center flex flex-col items-center pt-6 pb-6 px-4 gap-4 text-balance">
 		<img class="rounded-2xl h-[170px]" src="https://picsum.photos/id/830/170/170" alt="" />
 		<h1 class="h2 pt-4">Full Sheet</h1>

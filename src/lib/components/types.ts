@@ -15,6 +15,7 @@ export type BottomsheetProps = {
 	closeOnBackdropTap?: boolean
 	toggleOnHeaderTap?: boolean
 	flat?: boolean
+	nonmodal: boolean | number
 	onclose?: () => void
 	onsnap?: (progress: number) => void
 	header?: Snippet

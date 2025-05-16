@@ -29,6 +29,7 @@
 		header,
 		children,
 		flat = false,
+		nonmodal = false,
 		...props
 	}: BottomsheetProps = $props()
 
@@ -255,6 +256,18 @@
 		observer.observe(dialog)
 		return () => observer.disconnect()
 	})
+
+	function ontransitionend(e: TransitionEvent) {
+		if (e.propertyName !== 'translate') return
+		dialog.close()
+		const nonmodalAtIndex = nonmodal === true ? 0 : -1
+		if (snapPointIndex >= nonmodalAtIndex) {
+			if (snapPointIndex === 0 && height === maxHeight) dialog.showModal()
+			else dialog.show()
+		} else {
+			dialog.showModal()
+		}
+	}
 </script>
 
 {#if isOpen}
@@ -269,6 +282,7 @@
 		{onmovestart}
 		{onmove}
 		{onmoveend}
+		{ontransitionend}
 		use:draggable
 		use:dyanamicDuration
 	>

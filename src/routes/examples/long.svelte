@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Longsheet } from '@devantic/diaper'
+	import { Longsheet } from '$lib/components'
 	import { ChevronDownIcon, X } from '@lucide/svelte'
 	let open = $state(false)
 </script>
