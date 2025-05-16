@@ -125,10 +125,12 @@
 		const isHeader = isTouchingHeader(e.detail.target)
 		if (!canDragSheet && !isHeader) e.preventDefault()
 		if (refs.children?.scrollTop !== 0 && !isHeader) e.preventDefault()
+		dialog.close()
+		dialog.showModal()
 	}
 
 	function onmove(e: CustomEvent) {
-		const translateY = e.detail.translateY
+		const { deltaY, translateY } = e.detail
 		snapPointIndex = snappoints.indexOfNearest(translateY / dialogHeight)
 		applyProgress(clamp(translateY / (dialogHeight * snappoints.at(1)), 0, 1))
 	}
@@ -243,16 +245,23 @@
 		return () => observer.disconnect()
 	})
 
-	function ontransitionend(e: TransitionEvent) {
-		if (e.propertyName !== 'translate') return
+	function setModality() {
+		const nonmodalIndex = nonmodal === true ? 0 : nonmodal === false ? 999 : nonmodal
 		dialog.close()
-		const nonmodalAtIndex = nonmodal === true ? 0 : -1
-		if (snapPointIndex >= nonmodalAtIndex) {
-			if (snapPointIndex === 0 && height === maxHeight) dialog.showModal()
-			else dialog.show()
+		if (snapPointIndex >= nonmodalIndex) {
+			if (snapPointIndex === 0 && height === maxHeight) {
+				dialog.showModal()
+			} else {
+				dialog.show()
+			}
 		} else {
 			dialog.showModal()
 		}
+	}
+
+	function ontransitionend(e: TransitionEvent) {
+		if (e.propertyName !== 'translate') return
+		setModality()
 	}
 </script>
 
