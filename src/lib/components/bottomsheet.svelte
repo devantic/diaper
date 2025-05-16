@@ -2,8 +2,9 @@
 	import type { BottomsheetProps } from './types'
 	import { untrack } from 'svelte'
 	import { draggable, dyanamicDuration } from './actions.svelte'
-	import { noop, clamp, getNearestValue, indexOf } from './helpers'
+	import { noop, clamp } from './helpers'
 	import { insets } from './device.svelte'
+	import Snappoints from './snappoints.svelte'
 	import './diaper.css'
 	import './bottomsheet.css'
 </script>
@@ -65,7 +66,7 @@
 	let isMinimized = $state(false)
 	let autoHeight = $state(height)
 	let dialogHeight = $state(0)
-	let snappoints = $state.raw([0, 1])
+	let snappoints = new Snappoints()
 	let snapPointIndex = $state(initialIndex)
 	let headerHeight = $derived(refs.header?.offsetHeight ?? 0)
 	let mainHeight = $derived(dialogHeight - (headerOverlaysContent ? 0 : headerHeight))
@@ -76,21 +77,19 @@
 	let headerSnappoint = 0
 
 	const saib = insets.bottom
-	const getSnapPointIndex = (value: number) => indexOf(value, snappoints, 0)
-	const getNearestSnapPoint = (value: number) => getNearestValue(value, snappoints)
 	const isTouchingHeader = (target: HTMLElement) => refs.header!.contains(target)
 
 	function snapToIndex(index: number) {
 		// translate 16px more when the dialog is closing to
 		// prevent box-shadow jumping at end of transition
 		const translateMore = index < 0 ? 16 : 0
-		if (index < 0) index = snappoints.length - 1
-		snapPointIndex = clamp(index, 0, snappoints.length - 1)
-		const snapPoint = snappoints[snapPointIndex]
+		if (index < 0) index = snappoints.lastIndex
+		snapPointIndex = snappoints.clampIndex(index)
+		const snapPoint = snappoints.at(snapPointIndex)
 		onsnap?.(snapPoint)
 		const translateY = snapPoint * dialogHeight
 		dialog.style.setProperty('translate', `0 ${translateY + translateMore}px`)
-		const progress = clamp(snapPoint / snappoints[1], 0, 1)
+		const progress = clamp(snapPoint / snappoints.at(1), 0, 1)
 		applyProgress(progress)
 		open = snapPoint !== 1
 	}
@@ -129,8 +128,8 @@
 
 	function onmove(e: CustomEvent) {
 		const translateY = e.detail.translateY
-		snapPointIndex = getSnapPointIndex(getNearestSnapPoint(translateY / dialogHeight))
-		applyProgress(clamp(translateY / (dialogHeight * snappoints[1]), 0, 1))
+		snapPointIndex = snappoints.indexOfNearest(translateY / dialogHeight)
+		applyProgress(clamp(translateY / (dialogHeight * snappoints.at(1)), 0, 1))
 	}
 
 	function onmoveend(e: CustomEvent) {
@@ -157,7 +156,7 @@
 		// the target first. Obviously won't focus a non-focusable element
 		if (e.target !== e.currentTarget) (e.target as HTMLElement).focus()
 		if ((e.currentTarget as HTMLElement).contains(document.activeElement)) return
-		const headerIndex = getSnapPointIndex(headerSnappoint)
+		const headerIndex = snappoints.indexOf(headerSnappoint)
 		if (isMinimized) {
 			snapToIndex(initialIndex !== headerIndex ? initialIndex : 0)
 		} else {
@@ -241,8 +240,8 @@
 	// Effect 5 - calc snappoints
 	$effect(() => {
 		if (!rendered) return
-		snappoints = calcSnapPoints(snapPoints)
-		untrack(() => snapToIndex(stickyHeader && openSticky ? getSnapPointIndex(headerSnappoint) : (initialIndex ?? 0)))
+		snappoints.set(calcSnapPoints(snapPoints))
+		untrack(() => snapToIndex(stickyHeader && openSticky ? snappoints.indexOf(headerSnappoint) : (initialIndex ?? 0)))
 	})
 
 	// Effect 7 - minimize observer
@@ -256,7 +255,7 @@
 				isMinimized = ratio <= 1 - headerSnappoint
 				if (ratio <= 0) handleClose()
 			},
-			{ threshold: snappoints.map((p) => 1 - p), root: null, rootMargin: `0px 0px -${saib + 1}px 0px` }
+			{ threshold: snappoints.invert(), root: null, rootMargin: `0px 0px -${saib + 1}px 0px` }
 		)
 		observer.observe(dialog)
 		return () => observer.disconnect()
