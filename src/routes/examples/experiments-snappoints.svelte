@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Bottomsheet from '@devantic/diaper'
+	import Bottomsheet from '$lib/components'
 	let open = $state(false)
 	let bs: Bottomsheet
 

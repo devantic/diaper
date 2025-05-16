@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Detachedsheet } from '@devantic/diaper'
+	import { Detachedsheet } from '$lib/components'
 	let open = $state(false)
 </script>
 

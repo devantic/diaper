@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Longsheet } from '@devantic/diaper'
+	import { Longsheet } from '$lib/components'
 	let open = $state(false)
 </script>
 
