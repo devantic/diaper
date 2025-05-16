@@ -15,30 +15,35 @@ export function dyanamicDuration(node: HTMLElement) {
 	let diaperDuration = '0.4s'
 	let touchHistory: { y: number; time: number }[] = []
 
-	const touchstart = () => {
+	const ontouchstart = () => {
 		clearAll()
 		setDuration('0s')
 	}
-	const touchmove = (e: TouchEvent) => {
+	const ontouchmove = (e: TouchEvent) => {
 		push(e.touches[0].clientY)
 		setDuration('0s')
 	}
-	const touchend = () => {
+	const ontouchend = () => {
 		setDuration(calcDyanamicDuration())
+	}
+
+	function addEventListeners() {
+		node.addEventListener('touchstart', ontouchstart)
+		node.addEventListener('touchmove', ontouchmove)
+		node.addEventListener('touchend', ontouchend)
+	}
+
+	function removeEventListeners() {
+		node.removeEventListener('touchstart', ontouchstart)
+		node.removeEventListener('touchmove', ontouchmove)
+		node.removeEventListener('touchend', ontouchend)
 	}
 
 	$effect.pre(() => {
 		diaperDuration = getRootProperty('--diaper-default-duration')
 		setDuration(diaperDuration)
-
-		node.addEventListener('touchstart', touchstart)
-		node.addEventListener('touchmove', touchmove)
-		node.addEventListener('touchend', touchend)
-		return () => {
-			node.removeEventListener('touchstart', touchstart)
-			node.removeEventListener('touchmove', touchmove)
-			node.removeEventListener('touchend', touchend)
-		}
+		addEventListeners()
+		return removeEventListeners
 	})
 
 	function clearAll() {
@@ -154,16 +159,23 @@ export function draggable(node: HTMLElement): ActionReturn<Parameter, Attributes
 		}
 	}
 
-	$effect(() => {
-		setOverDragFillColor()
+	function addEventListeners() {
 		node.addEventListener('touchstart', ontouchstart)
 		node.addEventListener('touchmove', ontouchmove)
 		node.addEventListener('touchend', ontouchend)
-		return () => {
-			node.removeEventListener('touchstart', ontouchstart)
-			node.removeEventListener('touchmove', ontouchmove)
-			node.removeEventListener('touchend', ontouchend)
-		}
+	}
+
+	function removeEventListeners() {
+		node.removeEventListener('touchstart', ontouchstart)
+		node.removeEventListener('touchmove', ontouchmove)
+		node.removeEventListener('touchend', ontouchend)
+	}
+
+	$effect(() => {
+		setOverDragFillColor()
+		addEventListeners()
+		return removeEventListeners
 	})
+
 	return {}
 }
