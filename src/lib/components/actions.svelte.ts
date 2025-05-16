@@ -179,3 +179,16 @@ export function draggable(node: HTMLElement): ActionReturn<Parameter, Attributes
 
 	return {}
 }
+
+export function escapeToClose(node: HTMLElement, close: () => void) {
+	function handleEscape(e: KeyboardEvent) {
+		if (e.key === 'Escape' && node.contains(e.target as Node)) {
+			e.preventDefault()
+			close()
+		}
+	}
+	$effect(() => {
+		document.addEventListener('keydown', handleEscape)
+		return () => document.removeEventListener('keydown', handleEscape)
+	})
+}
