@@ -18,8 +18,9 @@
 	let saib = $state(0)
 	let innerHeight = $state(0)
 
-	let dialog = $state<HTMLDialogElement>()
 	let scrollContainer = $state<HTMLDivElement>()
+	let dialogContainer = $state<HTMLDivElement>()
+	let dialog = $state<HTMLDialogElement>()
 	let offsetHeight = $state(0)
 	let translate = $state(0)
 	let resistance = $derived(props.resistance || 'normal')
@@ -37,16 +38,15 @@
 
 	function noscroll(node: HTMLElement) {
 		// prevent scrolling on background
-		function touchmove(e: TouchEvent) {
-			if (!dialog!.contains(e.target as Node)) e.preventDefault()
+		function touchstart(e: TouchEvent) {
+			if (e.target === dialogContainer) e.preventDefault()
 		}
-		$effect(() => {
-			node.addEventListener('touchmove', touchmove)
-			return () => node.removeEventListener('touchmove', touchmove)
-		})
+		node.addEventListener('touchstart', touchstart)
+		return () => node.removeEventListener('touchstart', touchstart)
 	}
 
 	function handleContainerClick(e: MouseEvent) {
+		console.log(e.target, e.currentTarget)
 		if (closeOnClickOutside && e.target === e.currentTarget) {
 			open = false
 		}
@@ -92,8 +92,8 @@
 	<div transition:fade class="dialog-backdrop"></div>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div bind:this={scrollContainer} class="scroll-container" use:noscroll>
-		<div class="dialog-container" style:justify-content={props.justify || 'end'} style:height onclick={handleContainerClick}>
+	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll}>
+		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height onclick={handleContainerClick}>
 			<dialog
 				bind:this={dialog}
 				bind:offsetHeight
@@ -137,6 +137,7 @@
 		height: calc(100% + 1px);
 		padding-left: calc(var(--sail) + 0.375rem);
 		padding-right: calc(var(--sair) + 0.375rem);
+		background-color: #0f07;
 	}
 
 	dialog {
