@@ -45,10 +45,17 @@
 		return () => node.removeEventListener('touchstart', touchstart)
 	}
 
-	function handleContainerClick(e: MouseEvent) {
-		console.log(e.target, e.currentTarget)
-		if (closeOnClickOutside && e.target === e.currentTarget) {
-			open = false
+	let startTime = 0
+	function ontouchstart(e: TouchEvent) {
+		startTime = performance.now()
+	}
+
+	function ontouchend(e: TouchEvent) {
+		const now = performance.now()
+		if (now - startTime < 400) {
+			if (closeOnClickOutside && e.target === e.currentTarget) {
+				open = false
+			}
 		}
 	}
 
@@ -93,7 +100,7 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll}>
-		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height onclick={handleContainerClick}>
+		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height {ontouchstart} {ontouchend}>
 			<dialog
 				bind:this={dialog}
 				bind:offsetHeight
