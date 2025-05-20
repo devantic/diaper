@@ -78,6 +78,7 @@ export type BottomsheetProps = {
 	toggleOnHeaderTap?: boolean
 	closeOnBackdropTap?: boolean
 	flat?: boolean
+	nonmodal?: boolean | number
 	onclose?: () => void
 	onsnap?: (progress: number) => void
 	header?: Snippet
@@ -149,6 +150,10 @@ Boolean. Defaults to true.
 **`flat` - optional**
 
 Boolean. Don't scale the background. Defaults to false.
+
+**`nonmodal` - optional**
+
+Boolean or integer (snappoint index). For sheets that are not full height, allow the background to be interacted with while the sheet is open. If a snappoint index is specified, e.g. `nonmodal={1}` , the sheet will become nonmodal at that snappoint. Can be used to create a "detent" that sticks to the bottom of the screen. Defaults to false, i.e. modal.
 
 **`onclose()` - optional**
 
