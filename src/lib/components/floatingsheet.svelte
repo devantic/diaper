@@ -22,7 +22,6 @@
 	let dialogContainer = $state<HTMLDivElement>()
 	let dialog = $state<HTMLDialogElement>()
 	let offsetHeight = $state(0)
-	let translate = $state(0)
 	let resistance = $derived(props.resistance || 'normal')
 	let height = $derived.by(() => {
 		switch (resistance) {
@@ -50,12 +49,33 @@
 		startTime = performance.now()
 	}
 
+	let direction = $state('up')
+	const now = performance.now()
+	if (now - startTime < 400) {
+		if (closeOnClickOutside && e.target === e.currentTarget) {
+			open = false
+		}
+	}
 	function ontouchend(e: TouchEvent) {
-		const now = performance.now()
-		if (now - startTime < 400) {
-			if (closeOnClickOutside && e.target === e.currentTarget) {
-				open = false
+		console.log(initialScrollTop, scrollContainer!.scrollTop)
+		if (resistance === 'none') {
+			switch (props.justify) {
+				case 'start':
+					if (scrollContainer!.scrollTop - initialScrollTop < 100) break
+					open = false
+					return
+				case 'center':
+					if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) < 100) break
+					direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
+					open = false
+					return
+
+				case 'end':
+					if (initialScrollTop - scrollContainer!.scrollTop < 100) break
+					open = false
+					return
 			}
+			scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
 		}
 	}
 
@@ -65,6 +85,7 @@
 		sait = parseInt(getComputedStyle(scrollContainer).getPropertyValue('--sait'))
 	})
 
+	let initialScrollTop = 0
 	$effect(() => {
 		if (!dialog) return
 		if (resistance !== 'none') return
@@ -73,24 +94,20 @@
 			const yAdjust = innerHeight - offsetHeight - sait - saib
 			switch (props.justify) {
 				case 'start':
-					scrollContainer.scrollTop = yAdjust
-					translate = yAdjust
+					initialScrollTop = 0
 					break
 				case 'center':
-					scrollContainer.scrollTop = yAdjust / 2
-					translate = 0
+					initialScrollTop = yAdjust / 2
 					break
-				default: // end
-					scrollContainer.scrollTop = 0
-					translate = -yAdjust
+				case 'end':
+					initialScrollTop = yAdjust
 					break
 			}
+			scrollContainer.scrollTop = initialScrollTop
 		})
 	})
 
-	$effect(() => {
-		if (!open) translate = 0
-	})
+	$inspect(offsetHeight)
 </script>
 
 <svelte:window bind:innerHeight />
@@ -105,10 +122,14 @@
 				bind:this={dialog}
 				bind:offsetHeight
 				open
-				transition:fly={{ y: props.justify === 'start' ? -innerHeight / 2 : innerHeight / 2, opacity: 0 }}
+				in:fly={{ opacity: 1, duration: 2000, y: props.justify === 'start' ? -offsetHeight : offsetHeight }}
+				out:fly={{
+					opacity: 1,
+					duration: 2000,
+					y: props.justify === 'start' ? -offsetHeight : props.justify === 'end' ? offsetHeight : direction === 'up' ? -offsetHeight : offsetHeight
+				}}
 				class={props?.class}
 				style={props?.style}
-				style:translate="0 {translate}px"
 			>
 				{@render props.children?.()}
 			</dialog>
@@ -144,7 +165,7 @@
 		height: calc(100% + 1px);
 		padding-left: calc(var(--sail) + 0.375rem);
 		padding-right: calc(var(--sair) + 0.375rem);
-		background-color: #0f07;
+		/* background-color: #0f07; */
 	}
 
 	dialog {
