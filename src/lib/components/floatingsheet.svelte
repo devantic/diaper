@@ -49,7 +49,7 @@
 		startTime = performance.now()
 	}
 
-	let direction = $state('up')
+	let direction = $state('down')
 	const now = performance.now()
 	if (now - startTime < 400) {
 		if (closeOnClickOutside && e.target === e.currentTarget) {
@@ -122,10 +122,10 @@
 				bind:this={dialog}
 				bind:offsetHeight
 				open
-				in:fly={{ opacity: 1, duration: 2000, y: props.justify === 'start' ? -offsetHeight : offsetHeight }}
+				in:fly={{ opacity: 1, duration: 500, y: props.justify === 'start' ? -offsetHeight : offsetHeight }}
 				out:fly={{
 					opacity: 1,
-					duration: 2000,
+					duration: 500,
 					y: props.justify === 'start' ? -offsetHeight : props.justify === 'end' ? offsetHeight : direction === 'up' ? -offsetHeight : offsetHeight
 				}}
 				class={props?.class}
