@@ -50,13 +50,13 @@
 	}
 
 	let direction = $state('down')
-	const now = performance.now()
-	if (now - startTime < 400) {
-		if (closeOnClickOutside && e.target === e.currentTarget) {
-			open = false
-		}
-	}
 	function ontouchend(e: TouchEvent) {
+		const now = performance.now()
+		if (now - startTime < 400) {
+			if (closeOnClickOutside && e.target === e.currentTarget) {
+				open = false
+			}
+		}
 		console.log(initialScrollTop, scrollContainer!.scrollTop)
 		if (resistance === 'none') {
 			switch (props.justify) {
@@ -107,7 +107,26 @@
 		})
 	})
 
-	$inspect(offsetHeight)
+	let margins = {
+		top: 0,
+		bottom: 0
+	}
+	$effect(() => {
+		if (!dialog) return
+		const style = getComputedStyle(dialog)
+		margins.top = parseInt(style.getPropertyValue('margin-top'))
+		margins.bottom = parseInt(style.getPropertyValue('margin-bottom'))
+	})
+
+	let y = $derived(
+		props.justify === 'start'
+			? -offsetHeight - margins.top
+			: props.justify === 'end'
+				? offsetHeight + margins.bottom
+				: direction === 'up'
+					? -(innerHeight + offsetHeight) / 2
+					: (innerHeight + offsetHeight) / 2
+	)
 </script>
 
 <svelte:window bind:innerHeight />
@@ -119,14 +138,13 @@
 	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll}>
 		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height {ontouchstart} {ontouchend}>
 			<dialog
+				open
 				bind:this={dialog}
 				bind:offsetHeight
-				open
-				in:fly={{ opacity: 1, duration: 500, y: props.justify === 'start' ? -offsetHeight : offsetHeight }}
-				out:fly={{
+				transition:fly={{
 					opacity: 1,
 					duration: 500,
-					y: props.justify === 'start' ? -offsetHeight : props.justify === 'end' ? offsetHeight : direction === 'up' ? -offsetHeight : offsetHeight
+					y: y
 				}}
 				class={props?.class}
 				style={props?.style}
