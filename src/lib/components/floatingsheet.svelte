@@ -133,7 +133,7 @@
 		props.justify === 'start'
 			? -offsetHeight - margins.top
 			: props.justify === 'end'
-				? offsetHeight + margins.bottom
+				? offsetHeight + margins.top + margins.bottom
 				: direction === 'up'
 					? -(innerHeight + offsetHeight) / 2
 					: (innerHeight + offsetHeight) / 2
