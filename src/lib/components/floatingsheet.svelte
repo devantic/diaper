@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
+	import { swipeMonitor } from './actions.svelte'
 
 	type FloatingsheetProps = {
 		open?: boolean
@@ -50,7 +51,9 @@
 	}
 
 	let direction = $state('down')
+	let swipeSpeed = 0
 	function ontouchend(e: TouchEvent) {
+		console.log(swipeSpeed)
 		const now = performance.now()
 		if (now - startTime < 400) {
 			if (closeOnClickOutside && e.target === e.currentTarget) {
@@ -61,29 +64,42 @@
 		if (resistance === 'none') {
 			switch (props.justify) {
 				case 'start':
-					if (scrollContainer!.scrollTop - initialScrollTop > 100) {
+					if (swipeSpeed < -2) {
 						open = false
 						return
 					}
+					// if (scrollContainer!.scrollTop - initialScrollTop > 100) {
+					// 	open = false
+					// 	return
+					// }
 					if (scrollContainer!.scrollTop < initialScrollTop) {
 						return
 					}
 					break
 				case 'end':
-					if (initialScrollTop - scrollContainer!.scrollTop > 100) {
+					if (swipeSpeed > 2) {
 						open = false
 						return
 					}
+					// if (initialScrollTop - scrollContainer!.scrollTop > 100) {
+					// 	open = false
+					// 	return
+					// }
 					if (scrollContainer!.scrollTop > initialScrollTop) {
 						return
 					}
 					break
 				case 'center':
-					if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) > 100) {
+					if (Math.abs(swipeSpeed) > 3) {
 						direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
 						open = false
 						return
 					}
+					// if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) > 100) {
+					// 	direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
+					// 	open = false
+					// 	return
+					// }
 					break
 			}
 			scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
@@ -153,12 +169,14 @@
 				bind:this={dialog}
 				bind:offsetHeight
 				transition:fly={{
-					opacity: 1,
-					duration: 500,
+					opacity: 0,
+					duration: 300,
 					y: y
 				}}
 				class={props?.class}
 				style={props?.style}
+				{@attach swipeMonitor}
+				onswipe={(e) => (swipeSpeed = e.detail)}
 			>
 				{@render props.children?.()}
 			</dialog>
