@@ -50,6 +50,74 @@
 		startTime = performance.now()
 	}
 
+	import { Tween } from 'svelte/motion'
+	import { cubicOut } from 'svelte/easing'
+
+	let progress = new Tween(0, {
+		duration: 400,
+		easing: cubicOut
+	})
+	function smoothScrollTo(element: HTMLElement, targetX: number, duration = 500) {
+		// progress = new Tween(0, {
+		// 	duration: 400,
+		// 	easing: cubicOut
+		// })
+		progress.set(element.scrollTop, { duration: 0 })
+		progress.set(targetX, {
+			duration: 200,
+			easing: cubicOut
+		})
+		// .then(() => {
+		// 	progress.set(targetX, { duration: 0 })
+		// })
+		// progress.target = targetX
+		return
+		const startX = element.scrollTop
+		const distance = targetX - startX
+		let startTime: number | null = null
+
+		function step(timestamp: number) {
+			if (!startTime) startTime = timestamp
+			const progress = timestamp - startTime
+			const percent = Math.min(progress / duration, 1)
+			const ease = 0.5 - 0.5 * Math.cos(Math.PI * percent) // easeInOut
+
+			element.scrollTop = startX + distance * ease
+
+			if (percent < 1) {
+				requestAnimationFrame(step)
+			}
+		}
+
+		requestAnimationFrame(step)
+	}
+	$effect(() => {
+		if (!scrollContainer) return
+		scrollContainer.scrollTop = progress.current
+	})
+	// $inspect(progress.current)
+
+	function _smoothScrollTo(element, targetX, duration = 500) {
+		const startX = element.scrollTop
+		const distance = targetX - startX
+		let startTime = null
+
+		function step(timestamp) {
+			if (!startTime) startTime = timestamp
+			const progress = timestamp - startTime
+			const percent = Math.min(progress / duration, 1)
+			const ease = 0.5 - 0.5 * Math.cos(Math.PI * percent) // easeInOut
+
+			element.scrollTop = startX + distance * ease
+
+			if (percent < 1) {
+				requestAnimationFrame(step)
+			}
+		}
+
+		requestAnimationFrame(step)
+	}
+
 	let direction = $state('down')
 	let swipeSpeed = 0
 	function ontouchend(e: TouchEvent) {
@@ -102,7 +170,8 @@
 					// }
 					break
 			}
-			scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
+			// scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
+			smoothScrollTo(scrollContainer!, initialScrollTop, 200)
 		}
 	}
 
