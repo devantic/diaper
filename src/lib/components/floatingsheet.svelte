@@ -57,23 +57,34 @@
 				open = false
 			}
 		}
-		console.log(initialScrollTop, scrollContainer!.scrollTop)
+		// console.log(initialScrollTop, scrollContainer!.scrollTop)
 		if (resistance === 'none') {
 			switch (props.justify) {
 				case 'start':
-					if (scrollContainer!.scrollTop - initialScrollTop < 100) break
-					open = false
-					return
-				case 'center':
-					if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) < 100) break
-					direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
-					open = false
-					return
-
+					if (scrollContainer!.scrollTop - initialScrollTop > 100) {
+						open = false
+						return
+					}
+					if (scrollContainer!.scrollTop < initialScrollTop) {
+						return
+					}
+					break
 				case 'end':
-					if (initialScrollTop - scrollContainer!.scrollTop < 100) break
-					open = false
-					return
+					if (initialScrollTop - scrollContainer!.scrollTop > 100) {
+						open = false
+						return
+					}
+					if (scrollContainer!.scrollTop > initialScrollTop) {
+						return
+					}
+					break
+				case 'center':
+					if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) > 100) {
+						direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
+						open = false
+						return
+					}
+					break
 			}
 			scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
 		}
