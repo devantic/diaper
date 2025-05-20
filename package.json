@@ -1,7 +1,7 @@
 {
 	"name": "@devantic/diaper",
 	"private": true,
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -37,7 +37,7 @@
 		"vite": "^6.2.6"
 	},
 	"dependencies": {
-		"@devantic/diaper": "^2.1.4",
+		"@devantic/diaper": "^2.2.1",
 		"@lucide/svelte": "^0.487.0"
 	}
 }

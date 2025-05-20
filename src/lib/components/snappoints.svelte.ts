@@ -1,4 +1,4 @@
-import { clamp, getNearestValue, indexOf } from '$lib/components/helpers'
+import { clamp, getNearestValue, indexOf } from './helpers'
 
 export default class Snappoints {
 	values = $state.raw([0, 1])
