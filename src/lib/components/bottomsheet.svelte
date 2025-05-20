@@ -1,9 +1,10 @@
 <script module lang="ts">
 	import type { BottomsheetProps } from './types'
 	import { untrack } from 'svelte'
-	import { draggable, dyanamicDuration } from './actions.svelte'
-	import { noop, clamp, getNearestValue, indexOf } from './helpers'
+	import { draggable, dyanamicDuration, escapeToClose } from './actions.svelte'
+	import { noop, clamp } from './helpers'
 	import { insets } from './device.svelte'
+	import Snappoints from './snappoints.svelte'
 	import './diaper.css'
 	import './bottomsheet.css'
 </script>
@@ -28,6 +29,7 @@
 		header,
 		children,
 		flat = false,
+		nonmodal = false,
 		...props
 	}: BottomsheetProps = $props()
 
@@ -65,7 +67,7 @@
 	let isMinimized = $state(false)
 	let autoHeight = $state(height)
 	let dialogHeight = $state(0)
-	let snappoints = $state.raw([0, 1])
+	let snappoints = new Snappoints()
 	let snapPointIndex = $state(initialIndex)
 	let headerHeight = $derived(refs.header?.offsetHeight ?? 0)
 	let mainHeight = $derived(dialogHeight - (headerOverlaysContent ? 0 : headerHeight))
@@ -76,21 +78,19 @@
 	let headerSnappoint = 0
 
 	const saib = insets.bottom
-	const getSnapPointIndex = (value: number) => indexOf(value, snappoints, 0)
-	const getNearestSnapPoint = (value: number) => getNearestValue(value, snappoints)
 	const isTouchingHeader = (target: HTMLElement) => refs.header!.contains(target)
 
 	function snapToIndex(index: number) {
 		// translate 16px more when the dialog is closing to
 		// prevent box-shadow jumping at end of transition
 		const translateMore = index < 0 ? 16 : 0
-		if (index < 0) index = snappoints.length - 1
-		snapPointIndex = clamp(index, 0, snappoints.length - 1)
-		const snapPoint = snappoints[snapPointIndex]
+		if (index < 0) index = snappoints.lastIndex
+		snapPointIndex = snappoints.clampIndex(index)
+		const snapPoint = snappoints.at(snapPointIndex)
 		onsnap?.(snapPoint)
 		const translateY = snapPoint * dialogHeight
 		dialog.style.setProperty('translate', `0 ${translateY + translateMore}px`)
-		const progress = clamp(snapPoint / snappoints[1], 0, 1)
+		const progress = clamp(snapPoint / snappoints.at(1), 0, 1)
 		applyProgress(progress)
 		open = snapPoint !== 1
 	}
@@ -110,8 +110,8 @@
 
 	function applyProgress(progress: number) {
 		dialog.style.setProperty('--diaper-backdrop-progress', `${progress}`)
-		// only scale body or dialog underneath if drag is between full and the first snap point
 		if (flat) return
+		// only scale body or dialog underneath if drag is between full and the first snap point
 		if (backgroundElement === document.body) {
 			if (height === maxHeight) backgroundElement.style.setProperty('--diaper-progress', `${progress}`)
 		} else {
@@ -125,23 +125,20 @@
 		const isHeader = isTouchingHeader(e.detail.target)
 		if (!canDragSheet && !isHeader) e.preventDefault()
 		if (refs.children?.scrollTop !== 0 && !isHeader) e.preventDefault()
+		dialog.close()
+		dialog.showModal()
 	}
 
 	function onmove(e: CustomEvent) {
-		const translateY = e.detail.translateY
-		snapPointIndex = getSnapPointIndex(getNearestSnapPoint(translateY / dialogHeight))
-		applyProgress(clamp(translateY / (dialogHeight * snappoints[1]), 0, 1))
+		const { translateY } = e.detail
+		snapPointIndex = snappoints.indexOfNearest(translateY / dialogHeight)
+		applyProgress(clamp(translateY / (dialogHeight * snappoints.at(1)), 0, 1))
 	}
 
 	function onmoveend(e: CustomEvent) {
 		const deltaY = e.detail.deltaY
-		if (deltaY > 20) {
-			snapPointIndex += 2
-		} else if (deltaY > 5) {
-			snapPointIndex += 1
-		} else if (deltaY < -5) {
-			snapPointIndex = Math.max(--snapPointIndex, 0)
-		}
+		snapPointIndex += deltaY > 20 ? 2 : deltaY > 5 ? 1 : deltaY < -5 ? -1 : 0
+		snapPointIndex = Math.max(snapPointIndex, 0)
 		snapToIndex(snapPointIndex)
 		isTouching = false
 	}
@@ -157,7 +154,7 @@
 		// the target first. Obviously won't focus a non-focusable element
 		if (e.target !== e.currentTarget) (e.target as HTMLElement).focus()
 		if ((e.currentTarget as HTMLElement).contains(document.activeElement)) return
-		const headerIndex = getSnapPointIndex(headerSnappoint)
+		const headerIndex = snappoints.indexOf(headerSnappoint)
 		if (isMinimized) {
 			snapToIndex(initialIndex !== headerIndex ? initialIndex : 0)
 		} else {
@@ -191,40 +188,22 @@
 		if (closeOnBackdropTap && e.target === e.currentTarget) close()
 	}
 
-	function handleEscape(e: KeyboardEvent) {
-		if (e.key === 'Escape' && dialog.contains(e.target as Node)) {
-			e.preventDefault()
-			close()
-		}
-	}
-
 	// Effect 1 - open logic
 	$effect(() => {
 		if (open) isOpen = true
 		else if (isOpen) snapToIndex(-1)
 	})
 
-	// Effect 2 - escape key
-	$effect(() => {
-		if (!open) return
-		document.addEventListener('keydown', handleEscape)
-		return () => document.removeEventListener('keydown', handleEscape)
-	})
+	const dialogs = () => [...document.querySelectorAll('dialog[data-diaper]')] as HTMLDialogElement[]
 
 	// Effect 3 - show
 	$effect(() => {
 		if (!refs.ref) return
 		document.body.style.setProperty('overflow', 'hidden')
 		dialog = refs.ref as HTMLDialogElement
-		const dialogs = [...document.querySelectorAll('dialog')]
-		dialog.close()
-		if (stickyHeader && isMinimized && dialogs.length < 2) {
-			dialog.show()
-		} else {
-			dialog.showModal()
-		}
+		dialog.showModal()
 		dialogHeight = dialog.offsetHeight
-		backgroundElement = dialogs.at(-2) ?? document.body
+		backgroundElement = dialogs().at(-2) ?? document.body
 		initialized = true
 	})
 
@@ -238,24 +217,11 @@
 		autoHeight = `${offsetHeight}px`
 	})
 
-	// Effect 5 - overdrag
+	// Effect 5 - calc snappoints
 	$effect(() => {
 		if (!rendered) return
-		const styles = getComputedStyle(dialog)
-		const sheetBackgroundColor = styles.getPropertyValue('background-color')
-		const marginBottom = styles.getPropertyValue('margin-bottom')
-		if (parseInt(marginBottom) > 0) {
-			dialog.style.setProperty('--diaper-overdrag-fill-color', 'transparent')
-		} else {
-			dialog.style.setProperty('--diaper-overdrag-fill-color', sheetBackgroundColor)
-		}
-	})
-
-	// Effect 6 - calc snappoints
-	$effect(() => {
-		if (!rendered) return
-		snappoints = calcSnapPoints(snapPoints)
-		untrack(() => snapToIndex(stickyHeader && openSticky ? getSnapPointIndex(headerSnappoint) : (initialIndex ?? 0)))
+		snappoints.set(calcSnapPoints(snapPoints))
+		untrack(() => snapToIndex(stickyHeader && openSticky ? snappoints.indexOf(headerSnappoint) : (initialIndex ?? 0)))
 	})
 
 	// Effect 7 - minimize observer
@@ -269,11 +235,34 @@
 				isMinimized = ratio <= 1 - headerSnappoint
 				if (ratio <= 0) handleClose()
 			},
-			{ threshold: snappoints.map((p) => 1 - p), root: null, rootMargin: `0px 0px -${saib + 1}px 0px` }
+			{ threshold: snappoints.invert(), root: null, rootMargin: `0px 0px -${saib + 1}px 0px` }
 		)
 		observer.observe(dialog)
 		return () => observer.disconnect()
 	})
+
+	function setModality() {
+		const nonmodalIndex = nonmodal === true ? 0 : nonmodal === false ? 999 : nonmodal
+		dialog.close()
+		if (snapPointIndex >= nonmodalIndex) {
+			if (snapPointIndex === 0 && height === maxHeight) {
+				dialog.showModal()
+			} else {
+				dialog.show()
+			}
+		} else {
+			if (stickyHeader && isMinimized && dialogs().length < 2) {
+				dialog.show()
+			} else {
+				dialog.showModal()
+			}
+		}
+	}
+
+	function ontransitionend(e: TransitionEvent) {
+		if (e.propertyName !== 'translate') return
+		setModality()
+	}
 </script>
 
 {#if isOpen}
@@ -288,8 +277,10 @@
 		{onmovestart}
 		{onmove}
 		{onmoveend}
+		{ontransitionend}
 		use:draggable
 		use:dyanamicDuration
+		use:escapeToClose={close}
 	>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
