@@ -121,6 +121,21 @@
 					? -(innerHeight + offsetHeight) / 2
 					: (innerHeight + offsetHeight) / 2
 	)
+
+	let scrollFraction = $state(1)
+	function onscroll() {
+		switch (props.justify) {
+			case 'start':
+				scrollFraction = (offsetHeight - scrollContainer!.scrollTop) / offsetHeight
+				break
+			case 'end':
+				scrollFraction = 1 - (innerHeight - offsetHeight - scrollContainer!.scrollTop) / offsetHeight
+				break
+			case 'center':
+				scrollFraction = 1 - Math.abs(((innerHeight - offsetHeight) / 2 - scrollContainer!.scrollTop) / offsetHeight)
+		}
+		console.log(scrollFraction)
+	}
 </script>
 
 <svelte:window bind:innerHeight />
@@ -128,8 +143,8 @@
 {#if open}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div transition:fade class="dialog-backdrop"></div>
-	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll} {@attach smoothScroll}>
+	<div transition:fade class="dialog-backdrop" style:opacity={scrollFraction}></div>
+	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll} {@attach smoothScroll} {onscroll}>
 		<div
 			bind:this={dialogContainer}
 			class="dialog-container"
