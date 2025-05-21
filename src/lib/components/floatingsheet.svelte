@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
+	import { cubicOut, quintInOut, quintOut, backOut } from 'svelte/easing'
+	import { Tween } from 'svelte/motion'
 	import { fade, fly } from 'svelte/transition'
 
 	type FloatingsheetProps = {
@@ -86,13 +88,23 @@
 					}
 					break
 			}
-			scrollContainer?.style.setProperty('overflow-y', 'hidden')
-			setTimeout(() => {
-				scrollContainer?.style.setProperty('overflow-y', 'scroll')
-				scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
-			}, 0)
+			smoothScrollTo(scrollContainer!, initialScrollTop)
 		}
 	}
+
+	let progress = new Tween(0)
+	function smoothScrollTo(scrollContainer: HTMLElement, scrollTop: number, duration = 500, easing = quintOut) {
+		scrollContainer?.style.setProperty('overflow-y', 'hidden')
+		setTimeout(() => {
+			scrollContainer?.style.setProperty('overflow-y', 'scroll')
+			progress.set(scrollContainer.scrollTop, { duration: 0 })
+			progress.set(scrollTop, { duration, easing })
+		}, 0)
+	}
+	$effect(() => {
+		if (!scrollContainer) return
+		scrollContainer.scrollTop = progress.current
+	})
 
 	$effect(() => {
 		if (!scrollContainer) return
