@@ -26,17 +26,7 @@
 	let dialogContainer = $state<HTMLDivElement>()
 	let dialog = $state<HTMLDialogElement>()
 	let offsetHeight = $state(0)
-	let height = $derived.by(() => {
-		switch (resistance) {
-			case 'none':
-				return `calc(200% - ${offsetHeight + sait + saib}px)`
-			case 'futile':
-				return '100%'
-			case 'normal':
-			default:
-				return 'calc(100% + 1px)'
-		}
-	})
+	let height = $derived(resistance === 'none' ? `calc(200% - ${offsetHeight + sait + saib}px)` : resistance === 'futile' ? '100%' : 'calc(100% + 1px)')
 
 	let { smoothScroll, smoothScrollTo } = useSmoothScroll()
 
@@ -52,36 +42,35 @@
 	let direction = $state('down')
 	function ontouchend(e: TouchEvent) {
 		// console.log(initialScrollTop, scrollContainer!.scrollTop)
-		if (resistance === 'none') {
-			switch (props.justify) {
-				case 'start':
-					if (scrollContainer!.scrollTop - initialScrollTop > 100) {
-						open = false
-						return
-					}
-					if (scrollContainer!.scrollTop < initialScrollTop) {
-						return
-					}
-					break
-				case 'end':
-					if (initialScrollTop - scrollContainer!.scrollTop > 100) {
-						open = false
-						return
-					}
-					if (scrollContainer!.scrollTop > initialScrollTop) {
-						return
-					}
-					break
-				case 'center':
-					if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) > 100) {
-						direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
-						open = false
-						return
-					}
-					break
-			}
-			smoothScrollTo(initialScrollTop)
+		if (resistance !== 'none') return
+		switch (props.justify) {
+			case 'start':
+				if (scrollContainer!.scrollTop - initialScrollTop > 100) {
+					open = false
+					return
+				}
+				if (scrollContainer!.scrollTop < initialScrollTop) {
+					return
+				}
+				break
+			case 'end':
+				if (initialScrollTop - scrollContainer!.scrollTop > 100) {
+					open = false
+					return
+				}
+				if (scrollContainer!.scrollTop > initialScrollTop) {
+					return
+				}
+				break
+			case 'center':
+				if (Math.abs(scrollContainer!.scrollTop - initialScrollTop) > 100) {
+					direction = scrollContainer!.scrollTop > initialScrollTop ? 'up' : 'down'
+					open = false
+					return
+				}
+				break
 		}
+		smoothScrollTo(initialScrollTop)
 	}
 
 	$effect(() => {
