@@ -161,7 +161,7 @@
 {#if open}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div bind:this={dialogBackdrop} transition:fade class="dialog-backdrop"></div>
+	<div transition:fade class="dialog-backdrop"></div>
 	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll}>
 		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height {ontouchstart} {ontouchend}>
 			<dialog
