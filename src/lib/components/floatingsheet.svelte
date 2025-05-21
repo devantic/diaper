@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
 	import { useSmoothScroll } from './smoothscroll.svelte'
+	import { customClick } from './customclick.svelte'
 
 	type FloatingsheetProps = {
 		open?: boolean
@@ -48,19 +49,8 @@
 		return () => node.removeEventListener('touchstart', touchstart)
 	}
 
-	let startTime = 0
-	function ontouchstart(e: TouchEvent) {
-		startTime = performance.now()
-	}
-
 	let direction = $state('down')
 	function ontouchend(e: TouchEvent) {
-		const now = performance.now()
-		if (now - startTime < 400) {
-			if (closeOnClickOutside && e.target === e.currentTarget) {
-				open = false
-			}
-		}
 		// console.log(initialScrollTop, scrollContainer!.scrollTop)
 		if (resistance === 'none') {
 			switch (props.justify) {
@@ -151,7 +141,14 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div transition:fade class="dialog-backdrop"></div>
 	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll} {@attach smoothScroll}>
-		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height {ontouchstart} {ontouchend}>
+		<div
+			bind:this={dialogContainer}
+			class="dialog-container"
+			style:justify-content={props.justify || 'end'}
+			style:height
+			{@attach closeOnClickOutside && customClick(() => (open = false))}
+			{ontouchend}
+		>
 			<dialog
 				open
 				bind:this={dialog}
