@@ -21,7 +21,6 @@
 	let innerHeight = $state(0)
 
 	let scrollContainer = $state<HTMLDivElement>()
-	let dialogBackdrop = $state<HTMLDivElement>()
 	let dialogContainer = $state<HTMLDivElement>()
 	let dialog = $state<HTMLDialogElement>()
 	let offsetHeight = $state(0)
