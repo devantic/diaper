@@ -7,7 +7,7 @@
 	type FloatingsheetProps = {
 		open?: boolean
 		justify?: 'start' | 'center' | 'end'
-		resistance?: 'none' | 'normal' | 'futile'
+		type?: 'dismissible' | 'fixed'
 		children?: Snippet
 		closeOnClickOutside?: boolean
 		class?: string
@@ -15,6 +15,8 @@
 	}
 
 	let { open = $bindable(false), closeOnClickOutside = true, ...props }: FloatingsheetProps = $props()
+
+	let resistance = $derived(props.type === 'dismissible' ? 'none' : props.type === 'fixed' ? 'futile' : 'normal')
 
 	let sait = $state(0)
 	let saib = $state(0)
@@ -24,7 +26,6 @@
 	let dialogContainer = $state<HTMLDivElement>()
 	let dialog = $state<HTMLDialogElement>()
 	let offsetHeight = $state(0)
-	let resistance = $derived(props.resistance || 'normal')
 	let height = $derived.by(() => {
 		switch (resistance) {
 			case 'none':
