@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
-	import { cubicOut, quintInOut, quintOut, backOut } from 'svelte/easing'
-	import { Tween } from 'svelte/motion'
 	import { fade, fly } from 'svelte/transition'
+	import { useSmoothScroll } from './smoothscroll.svelte'
 
 	type FloatingsheetProps = {
 		open?: boolean
@@ -37,6 +36,8 @@
 				return 'calc(100% + 1px)'
 		}
 	})
+
+	let { smoothScroll, smoothScrollTo } = useSmoothScroll()
 
 	function noscroll(node: HTMLElement) {
 		// prevent scrolling on background
@@ -89,23 +90,9 @@
 					}
 					break
 			}
-			smoothScrollTo(scrollContainer!, initialScrollTop)
+			smoothScrollTo(initialScrollTop)
 		}
 	}
-
-	let progress = new Tween(0)
-	function smoothScrollTo(scrollContainer: HTMLElement, scrollTop: number, duration = 500, easing = quintOut) {
-		scrollContainer?.style.setProperty('overflow-y', 'hidden')
-		setTimeout(() => {
-			scrollContainer?.style.setProperty('overflow-y', 'scroll')
-			progress.set(scrollContainer.scrollTop, { duration: 0 })
-			progress.set(scrollTop, { duration, easing })
-		}, 0)
-	}
-	$effect(() => {
-		if (!scrollContainer) return
-		scrollContainer.scrollTop = progress.current
-	})
 
 	$effect(() => {
 		if (!scrollContainer) return
@@ -163,7 +150,7 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div transition:fade class="dialog-backdrop"></div>
-	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll}>
+	<div bind:this={scrollContainer} class="scroll-container" {@attach noscroll} {@attach smoothScroll}>
 		<div bind:this={dialogContainer} class="dialog-container" style:justify-content={props.justify || 'end'} style:height {ontouchstart} {ontouchend}>
 			<dialog
 				open
