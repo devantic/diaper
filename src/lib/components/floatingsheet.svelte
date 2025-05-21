@@ -86,7 +86,11 @@
 					}
 					break
 			}
-			scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
+			scrollContainer?.style.setProperty('overflow-y', 'hidden')
+			setTimeout(() => {
+				scrollContainer?.style.setProperty('overflow-y', 'scroll')
+				scrollContainer?.scrollTo({ top: initialScrollTop, behavior: 'smooth' })
+			}, 0)
 		}
 	}
 
