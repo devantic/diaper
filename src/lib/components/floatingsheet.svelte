@@ -126,7 +126,8 @@
 	function onscroll() {
 		switch (props.justify) {
 			case 'start':
-				scrollFraction = (offsetHeight - scrollContainer!.scrollTop) / offsetHeight
+				const scrolledBeyondHalf = scrollContainer!.scrollTop - initialScrollTop - offsetHeight / 2
+				scrollFraction = Math.max(0, 1 - scrolledBeyondHalf / (offsetHeight / 2))
 				break
 			case 'end':
 				scrollFraction = 1 - (innerHeight - offsetHeight - scrollContainer!.scrollTop) / offsetHeight
