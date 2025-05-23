@@ -34,6 +34,12 @@
 	}: BottomsheetProps = $props()
 
 	export function showModal() {
+		isNonmodal = false
+		open = true
+	}
+
+	export function show() {
+		isNonmodal = true
 		open = true
 	}
 
@@ -62,6 +68,7 @@
 	})
 
 	let isOpen = $state(false)
+	let isNonmodal = $derived(nonmodal)
 	let initialized = $state(false)
 	let rendered = $state(false)
 	let isMinimized = $state(false)
@@ -109,7 +116,7 @@
 	}
 
 	function applyProgress(progress: number) {
-		dialog.style.setProperty('--diaper-backdrop-progress', `${progress}`)
+		if (!isNonmodal) dialog.style.setProperty('--diaper-backdrop-progress', `${progress}`)
 		if (flat) return
 		// only scale body or dialog underneath if drag is between full and the first snap point
 		if (backgroundElement === document.body) {
@@ -242,7 +249,7 @@
 	})
 
 	function setModality() {
-		const nonmodalIndex = nonmodal === true ? 0 : nonmodal === false ? 999 : nonmodal
+		const nonmodalIndex = isNonmodal === true ? 0 : isNonmodal === false ? 999 : isNonmodal
 		dialog.close()
 		if (snapPointIndex >= nonmodalIndex) {
 			if (snapPointIndex === 0 && height === maxHeight) {

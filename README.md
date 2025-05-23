@@ -99,7 +99,7 @@ export type LongsheetProps = {
 
 **`open` - optional, bindable**
 
-A boolean value controlling the open/closed state of the bottom sheet. You can `bind:open` to it which is the prefered method of control. Or you can `bind:this` to the component instance and control it using the `showModal()` and `close()` methods - see [Programmatic Control](#programmatic-control)
+A boolean value controlling the open/closed state of the bottom sheet. You can `bind:open` to it which is the prefered method of control. Or you can `bind:this` to the component instance and control it using the `showModal()` or `show()`, and `close()` methods - see [Programmatic Control](#programmatic-control)
 
 **`height` - optional**
 
@@ -186,6 +186,7 @@ If specified, the content of the sheet will change to this content when dragged 
 Use the `bind:this` directive to expose the instance methods:
 
 - showModal()
+- show()
 - close()
 - snapTo(index)
 
