@@ -41,6 +41,6 @@
 html {
 	background-color: black;
 	min-height: calc(100% + var(--diaper-sait));
-	padding-bottom: env(var(--diaper-saib));
+	padding-bottom: var(--diaper-saib);
 	overscroll-behavior-y: none;
 }
